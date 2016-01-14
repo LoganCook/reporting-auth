@@ -86,36 +86,24 @@ def details(account, cache=0):
     authorisations = Authorisation.query(Authorisation.account ==
                                          account.key).iter()
     endpoints = ndb.get_multi([auth.endpoint for auth in authorisations])
-    return response({
-        "email": account.email,
-        "name": account.name,
-        "secret": account.secret,
-        "timestamp": datetime_to_epoch(account.timestamp),
-        "endpoints": [{
-            "id": endpoint.key.id(),
-            "name": endpoint.name,
-            "url": endpoint.url,
-            "timestamp": datetime_to_epoch(endpoint.timestamp)
-        } for endpoint in endpoints]
-    }, cache)
+    return response(
+        {
+            "email": account.email,
+            "name": account.name,
+            "secret": account.secret,
+            "timestamp": datetime_to_epoch(account.timestamp),
+            "endpoints": [{
+                "id": endpoint.key.id(),
+                "name": endpoint.name,
+                "url": endpoint.url,
+                "timestamp": datetime_to_epoch(endpoint.timestamp)
+            } for endpoint in endpoints]
+        }, cache)
 
 
 class PingResource(Resource):
     def get(self):
         return "pong"
-
-
-class InitResource(Resource):
-    def put(self):
-        endpoint = Endpoint(name="dummy-endpoint",
-                            url="https://dummy-endpoint")
-        endpoint.put()
-        account = Account(name="dummy-account",
-                          email="dummy@account",
-                          secret=str(uuid.uuid4()))
-        account.put()
-        Authorisation(account=account.key, endpoint=endpoint.key).put()
-        return "", 204
 
 
 class EndpointResource(Resource):
@@ -165,6 +153,12 @@ class AuthResource(Resource):
                               name=name,
                               secret=str(uuid.uuid4()))
             account.put()
+            # Temporary convenience: add auth for eRSA users.
+            if email.endswith("@ersa.edu.au"):
+                futures = [Authorisation(account=account.key,
+                                         endpoint=endpoint.key).put_async()
+                           for endpoint in Endpoint.query().iter()]
+                ndb.Future.wait_all(futures)
         authorisations = Authorisation.query(Authorisation.account ==
                                              account.key).iter()
         endpoints = ndb.get_multi([auth.endpoint for auth in authorisations])
@@ -174,5 +168,8 @@ class AuthResource(Resource):
             "url": endpoint.url,
             "timestamp": datetime_to_epoch(endpoint.timestamp)
         } for endpoint in endpoints]
-        html = render_template("auth.html", endpoints=endpoints, email=account.email, secret=account.secret)
+        html = render_template("auth.html",
+                               endpoints=endpoints,
+                               email=account.email,
+                               secret=account.secret)
         return make_response(html, 200, HTML_HEADERS)
