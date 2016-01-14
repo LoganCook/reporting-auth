@@ -1,0 +1,18 @@
+application: ersa-reporting-auth
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+libraries:
+- name: yaml
+  version: latest
+- name: ssl
+  version: latest
+- name: pycrypto
+  version: latest
+
+handlers:
+- url: .*
+  script: main.app
+  secure: always

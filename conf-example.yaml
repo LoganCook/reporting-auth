@@ -1,0 +1,5 @@
+aaf:
+    audience: "https://reporting.ersa.edu.au"
+    secret: "[secret specified in aaf rapid connect registration]"
+
+endpoint: "secret token for endpoint updates"

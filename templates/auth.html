@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Reporting Authentication/Authorisation</title>
+</head>
+
+<body>
+    <script>
+        sessionStorage.clear();
+
+        sessionStorage.email = "{{ email }}";
+        sessionStorage.secret = "{{ secret }}";
+
+        {% for endpoint in endpoints %}
+        sessionStorage.{{ endpoint.id }} = "{{ endpoint.url }}";
+        {% endfor %}
+
+        window.location.replace("/");
+    </script>
+</body>
+</html>
