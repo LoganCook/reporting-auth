@@ -106,6 +106,19 @@ class PingResource(Resource):
         return "pong"
 
 
+class InitResource(Resource):
+    def put(self):
+        endpoint = Endpoint(name="dummy-endpoint",
+                            url="https://dummy-endpoint")
+        endpoint.put()
+        account = Account(name="dummy-account",
+                          email="dummy@account",
+                          secret=str(uuid.uuid4()))
+        account.put()
+        Authorisation(account=account.key, endpoint=endpoint.key).put()
+        return "", 204
+
+
 class EndpointResource(Resource):
     def get(self):
         args = ENDPOINT.parse_args()
