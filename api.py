@@ -8,7 +8,7 @@ import uuid
 import jwt
 
 from flask import request, make_response, render_template
-from flask.ext.restful import reqparse, Resource
+from flask_restful import reqparse, Resource
 
 from google.appengine.ext import ndb
 

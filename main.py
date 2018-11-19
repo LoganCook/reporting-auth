@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 
 from flask import Flask
-from flask.ext import restful
+import flask_restful
 
 import yaml
 
 import api
 
 app = Flask(__name__)
-restapi = restful.Api(app)
+restapi = flask_restful.Api(app)
 
 def add(target, endpoint):
     restapi.add_resource(target, endpoint)
